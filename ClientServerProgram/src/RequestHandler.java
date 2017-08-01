@@ -35,6 +35,8 @@ public class RequestHandler implements Runnable {
 				writer.write("#######you entered :"+ userInput);
 				writer.newLine();
 				writer.flush();
+                              //  wait(100000);
+//                                System.out.println(notify());
 			}
 		}catch(IOException e){
 			System.out.println("###I/O exception###"+e);

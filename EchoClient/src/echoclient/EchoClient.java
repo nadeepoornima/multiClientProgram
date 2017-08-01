@@ -6,6 +6,7 @@
 package echoclient;
 
 import java.io.BufferedReader;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
@@ -16,31 +17,67 @@ import java.net.UnknownHostException;
  *
  * @author nadee
  */
-public class EchoClient {
+class EchoClient implements Runnable{
+         
+    @Override
+    public void run(){
 
-    public static void main(String[] args) throws IOException{
-        if(args.length != 2){
-            System.err.println("#############Usaage: Java EchoClient <host name> <port number>");
-            System.exit(1);
+        String sentence;
+        String modifiedSentence = null;
+        Socket clientSocket = null;
+        try {
+            clientSocket = new Socket("localhost", 8005);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-        String hostName = args[0];
-        int portNumber = Integer.parseInt(args[1]);
-        try(Socket echoSocket = new Socket(hostName, portNumber);
-                PrintWriter out = new PrintWriter(echoSocket.getOutputStream(),true);
-                BufferedReader in = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));
-                BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in))
-                        ){
-                    String userInput;
-                    while((userInput = stdIn.readLine()) != null){
-                        out.println(userInput);
-                        System.out.println("##########echo: "+in.readLine());
-                    }
-                }catch (UnknownHostException e){
-                    System.err.println("##########Don't know about host"+hostName);
-                    System.exit(1);
-                }catch(IOException e){
-                    System.err.println("################Couldn't get I/O for the connection to"+ hostName);
-                    System.exit(1);
-                }
-        }    
+        DataOutputStream outToServer = null;
+        try {
+            outToServer = new DataOutputStream(clientSocket.getOutputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        BufferedReader inFromServer = null;
+        try {
+            inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        sentence = "Client carries the number :" + String.valueOf(Math.random());
+        try {
+            outToServer.writeBytes(sentence + '\n');
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
+            modifiedSentence = inFromServer.readLine();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        System.out.println("FROM SERVER: " + modifiedSentence);
+
+        try {
+            clientSocket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+}
+
+         
+         
+}
+
+ class runClients {
+    
+    public static void main(String args[]){
+        
+        int nClients = Integer.parseInt(args[0]);
+        
+        for(int i =0 ; i < nClients ; i++){
+            new Thread(new EchoClient()).start();
+        }
+        
+    }
+    
 }
