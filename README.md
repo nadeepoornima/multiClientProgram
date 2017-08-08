@@ -6,6 +6,6 @@ This is a sample multi client server program. This has implemented by using the 
 
 1. First clone the project
 2. Export the project to your IDE through pom.xml
-3. First run the server and give the maxthread pol size
+3. First run the server and give the maxthread pool size
 4. Then run the client
 5. You can type message on client and see it at server 
